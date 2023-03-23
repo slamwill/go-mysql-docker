@@ -7,6 +7,7 @@ require (
 	github.com/cenkalti/backoff v2.0.0+incompatible // indirect
 	github.com/containerd/continuity v0.1.0 // indirect
 	github.com/gotestyourself/gotestyourself v1.3.0 // indirect
+	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.3 // indirect
 	github.com/labstack/echo/v4 v4.2.2
 	github.com/mattn/go-colorable v0.1.8 // indirect

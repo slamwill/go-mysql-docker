@@ -7,10 +7,12 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"database/sql"
     "fmt"
-    "time"
+    _ "time"
 	"strconv"
 	"strings"
     _ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
+	// _ "github.com/joho/godotenv/autoload"
 )
 
 func main() {
@@ -25,6 +27,29 @@ func main() {
 	})
 
 	e.GET("/ping", func(c echo.Context) error {
+
+		var envs map[string]string
+		envs, err := godotenv.Read(".env")
+		if err != nil {
+			// log.Fatal("Error loading .env file")
+		}
+		mysql_root_password := envs["MYSQL_ROOT_PASSWORD"]
+		db_user := envs["DB_USER"]
+		db_password := envs["DB_PASSWORD"]
+		// fmt.Printf("%s uses %s\n", db_user, db_password)
+		fmt.Println("11111")
+		fmt.Println(mysql_root_password)
+		fmt.Println(db_user)
+		fmt.Println(db_password)
+		fmt.Println("11111")
+
+
+		// godotenv.Load()
+		// fmt.Println("11111")
+		// os.Setenv("DB_USER", "admin1234")
+		// fmt.Printf("os.Getenv(): %s=%s\n", "DB_USER", os.Getenv("DB_USER"))
+		// fmt.Printf("os.Getenv(): %s=%s\n", "DB_PASSWORD", os.Getenv("DB_PASSWORD"))
+
 		return c.JSON(http.StatusOK, struct{ Status string }{Status: "OK"})
 	})
 
@@ -44,11 +69,6 @@ func main() {
 		retStr := hello()
 		fmt.Println(retStr)
 		return c.JSON(http.StatusOK, struct{ Status string }{Status: retStr})
-	})
-
-	e.GET("/getdb", func(c echo.Context) error {
-		retStr := getSingleDataFromDBold()
-		return c.JSON(http.StatusOK, struct{ Username string } {Username: "Hi " + retStr})
 	})
 
 	e.GET("/getSingleDataFromDB", func(c echo.Context) error {
@@ -74,8 +94,6 @@ func main() {
 			if err != nil {
 				return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid ID: " + idString})
 			}
-
-			// fmt.Printf("id is %d", id)
 
 			ids[i] = id
 		}
@@ -183,37 +201,4 @@ func hello() string {
 	
 	var str = "Hello, World!"
 	return str
-}
-
-func getSingleDataFromDBold() string {
-	const (
-		UserName     string = "vt_test_0906"
-		Password     string = "JSnPK7eduQ8v8QCA7YdynDxVrewgb3yP"
-		Addr         string = "34.80.26.167"
-		Port         int    = 3306
-		Database     string = "voicetube"
-		MaxLifetime  int    = 10
-		MaxOpenConns int    = 10
-		MaxIdleConns int    = 10
-	)
-
-	conn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", UserName, Password, Addr, Port, Database)
-	DB, err := sql.Open("mysql", conn)
-	if err != nil {
-		fmt.Println("connection to mysql failed:", err)
-		var retStr = "failed"
-		return retStr
-	}
-    DB.SetConnMaxLifetime(time.Duration(MaxLifetime) * time.Second)
-	DB.SetMaxOpenConns(MaxOpenConns)
-	DB.SetMaxIdleConns(MaxIdleConns)
-	row := DB.QueryRow("select id,name from users where id=?", 4814546)
-
-	var id int
-	var name string
-	err = row.Scan(&id, &name)
-	// checkErr(err)
-	var retStr = name
-	defer DB.Close()
-	return retStr
 }
